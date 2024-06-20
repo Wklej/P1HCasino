@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BlackJack Multiplayer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script>
+        let stompClient = null;
+        let connected = false; // Flag to track if the connection is established
+
+        function connect() {
+            const socket = new SockJS('/blackjack');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, function (frame) {
+                console.log('Connected: ' + frame);
+                connected = true; // Set connection flag to true
+                stompClient.subscribe('/topic/updates', function (message) {
+                    showValue(JSON.parse(message.body));
+                });
+                stompClient.subscribe('/topic/players', function (message) {
+                    updatePlayersList(JSON.parse(message.body));
+                });
+                stompClient.send("/app/current", {}, {});
+                if (localStorage.getItem("playerJoined") === 'true') {
+                    console.log("player already in session")
+                } else {
+                    joinGame(); // Call joinGame() after connection is established
+                }
+            });
+        }
+
+        function updateValue() {
+            const value = parseInt(document.getElementById('value').value);
+            if (connected) { // Check if connection is established
+                stompClient.send("/app/update", {}, JSON.stringify(value));
+            } else {
+                console.error("WebSocket connection not established yet.");
+            }
+        }
+
+        function showValue(value) {
+            document.getElementById('sharedValue').innerText = value;
+        }
+
+        function joinGame() {
+            if (connected) { // Check if connection is established
+                const playerName = "PLAYER"
+                localStorage.setItem("playerJoined", 'true')
+                stompClient.send("/app/join", {}, playerName);
+            } else {
+                console.error("WebSocket connection not established yet.");
+            }
+        }
+
+        function updatePlayersList(players) {
+            const playersDiv = document.getElementById("players");
+            playersDiv.innerHTML = ""; // Clear previous list
+
+            players.forEach(player => {
+                const playerDiv = document.createElement("div");
+                playerDiv.innerText = player;
+                playersDiv.appendChild(playerDiv);
+            });
+        }
+
+        window.onload = function() {
+            connect();
+        };
+    </script>
+</head>
+<body>
+<div>
+    <label for="value">Enter new value: </label>
+    <input type="number" id="value">
+    <button onclick="updateValue()">Update</button>
+</div>
+<div>
+    <h2>Current Shared Value: <span id="sharedValue">0</span></h2>
+</div>
+<div>
+    <h2>Players:</h2>
+    <div id="players" class="container">
+        <!-- Player names will be dynamically added here -->
+    </div>
+</div>
+</body>
+</html>
