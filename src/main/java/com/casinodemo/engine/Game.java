@@ -2,25 +2,44 @@ package com.casinodemo.engine;
 
 import com.casinodemo.engine.objects.Card;
 import com.casinodemo.engine.objects.enums.RANK;
+import lombok.Getter;
 
 import java.util.List;
 
+@Getter
 public class Game {
     private GameState state;
 
+    public Game() {
+        this.state = new GameState();
+    }
+
+    public GameState start() {
+        // Init hands
+        state.getPlayer().setPlayerHand(List.of(state.drawCard(), state.drawCard()));
+        state.getDealer().setDealerHand(List.of(state.drawCard()));
+
+        // Calculate scores
+        state.getPlayer().setScore(calculateHand(state.getPlayer().getPlayerHand()));
+        state.getDealer().setScore(calculateHand(state.getDealer().getDealerHand()));
+
+        return state;
+    }
+
+
     public void play(int player) {
-        var playerState = state.getPlayers().get(player);
-        var playerScore = calculateHand(playerState.getPlayerHand());
-        var dealerScore = calculateHand(state.getDealerHand());
+//        var playerState = state.getPlayers().get(player);
+//        var playerScore = calculateHand(playerState.getPlayerHand());
+//        var dealerScore = calculateHand(state.getDealerHand());
+//
+//        if (isBlackJack(playerState.getPlayerHand()) && !isBlackJack(state.getDealerHand())) {
+//            playerState.setWin(true);
+//            return;
+//        }
+//
+//        if (!isBust(playerScore)) {
 
-        if (isBlackJack(playerState.getPlayerHand()) && !isBlackJack(state.getDealerHand())) {
-            playerState.setWin(true);
-            return;
-        }
-
-        if (!isBust(playerScore)) {
-
-        }
+//        }
 
 
 

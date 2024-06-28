@@ -58,10 +58,30 @@ function renderCards() {
  * init hands + updateState()
  * Place bets here in future also
  */
-function startGame() {
-    playerCards = [getRandomCard(), getRandomCard()];
-    dealerCards = [getRandomCard()];
-    updateState()
+async function startGame() {
+    try{
+        const response = await fetch("/start")
+        const status = await response.json()
+        const dealerHand = status.dealer.dealerHand
+        const playerHand = status.player.playerHand
+        console.log(status)
+
+        playerCards = getPlayerHand(playerHand)
+        dealerCards = getDealerHand(dealerHand);
+        updateState()
+    } catch (err) {
+        console.error('error starting game: ', err)
+    }
+}
+
+function getPlayerHand(playerHand) {
+    return [
+        {value: playerHand[0].value, rank: playerHand[0].rank},
+        {value: playerHand[1].value, rank: playerHand[1].rank}]
+}
+
+function getDealerHand(dealerHand) {
+    return [{value: dealerHand[0].value, rank: dealerHand[0].rank}]
 }
 
 /**
