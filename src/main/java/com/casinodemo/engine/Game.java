@@ -14,7 +14,7 @@ public class Game {
         this.state = new GameState();
     }
 
-    public GameState start() {
+    public void start() {
         // Init hands
         state.getPlayer().setPlayerHand(List.of(state.drawCard(), state.drawCard()));
         state.getDealer().setDealerHand(List.of(state.drawCard()));
@@ -22,10 +22,23 @@ public class Game {
         // Calculate scores
         state.getPlayer().setScore(calculateHand(state.getPlayer().getPlayerHand()));
         state.getDealer().setScore(calculateHand(state.getDealer().getDealerHand()));
-
-        return state;
     }
 
+    public int getPlayerScore() {
+        return state.getPlayer().getScore();
+    }
+
+    public int getDealerScore() {
+        return state.getDealer().getScore();
+    }
+
+    public List<Card> getPlayerHand() {
+        return state.getPlayer().getPlayerHand();
+    }
+
+    public List<Card> getDealerHand() {
+        return state.getDealer().getDealerHand();
+    }
 
     public void play(int player) {
 //        var playerState = state.getPlayers().get(player);

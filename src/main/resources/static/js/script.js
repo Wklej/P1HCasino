@@ -37,10 +37,16 @@ function getCardValue(card) {
 /**
  * Calculate hands for dealer and player + updating score div
  */
-function updateScores() {
+async function updateScores() {
     // dealerScore = stompClient.send(/app/calculateHand) or something like that
-    dealerScore = dealerCards.reduce((sum, card) => sum + getCardValue(card), 0);
-    playerScore = playerCards.reduce((sum, card) => sum + getCardValue(card), 0);
+    dealerScore = await fetch("/getDealerScore")
+        .then(response => response.json())
+    playerScore = await fetch("/getPlayerScore")
+        .then(response => response.json())
+
+    //original code - JS evaluation
+    // dealerScore = dealerCards.reduce((sum, card) => sum + getCardValue(card), 0);
+    // playerScore = playerCards.reduce((sum, card) => sum + getCardValue(card), 0);
 
     dealerScoreDiv.innerText = `Score: ${dealerScore}`;
     playerScoreDiv.innerText = `Score: ${playerScore}`;
@@ -59,29 +65,25 @@ function renderCards() {
  * Place bets here in future also
  */
 async function startGame() {
-    try{
-        const response = await fetch("/start")
-        const status = await response.json()
-        const dealerHand = status.dealer.dealerHand
-        const playerHand = status.player.playerHand
-        console.log(status)
+    try {
+        await fetch("/start")
 
-        playerCards = getPlayerHand(playerHand)
-        dealerCards = getDealerHand(dealerHand);
+        const dealerHandResponse = await fetch("/getDealerHand")
+            .then(response => response.json())
+        const playerHandResponse = await fetch("/getPlayerHand")
+            .then(response => response.json())
+
+        dealerCards = mapHand(dealerHandResponse)
+        playerCards = mapHand(playerHandResponse)
+
         updateState()
     } catch (err) {
         console.error('error starting game: ', err)
     }
 }
 
-function getPlayerHand(playerHand) {
-    return [
-        {value: playerHand[0].value, rank: playerHand[0].rank},
-        {value: playerHand[1].value, rank: playerHand[1].rank}]
-}
-
-function getDealerHand(dealerHand) {
-    return [{value: dealerHand[0].value, rank: dealerHand[0].rank}]
+function mapHand(hand) {
+    return hand.map(card => ({ value: card.value, rank: card.rank }));
 }
 
 /**

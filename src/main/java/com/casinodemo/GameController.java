@@ -2,6 +2,7 @@ package com.casinodemo;
 
 import com.casinodemo.engine.Game;
 import com.casinodemo.engine.GameState;
+import com.casinodemo.engine.objects.Card;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -52,7 +53,27 @@ public class GameController {
     }
 
     @GetMapping("/start")
-    public GameState startGame() {
-        return game.start();
+    public void startGame() {
+        game.start();
+    }
+
+    @GetMapping("/getPlayerScore")
+    public int getPlayerScore() {
+        return game.getPlayerScore();
+    }
+
+    @GetMapping("/getDealerScore")
+    public int getDealerScore() {
+        return game.getDealerScore();
+    }
+
+    @GetMapping("/getPlayerHand")
+    public List<Card> getPlayerHand() {
+        return game.getPlayerHand();
+    }
+
+    @GetMapping("/getDealerHand")
+    public List<Card> getDealerHand() {
+        return game.getDealerHand();
     }
 }
