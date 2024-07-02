@@ -15,9 +15,14 @@ public class Game {
     }
 
     public void start() {
+        // Reset hands
+        state.getPlayer().clearHand();
+        state.getDealer().clearHand();
+        state.getDeck().shuffleDeck();
+
         // Init hands
-        state.getPlayer().setPlayerHand(List.of(state.drawCard(), state.drawCard()));
-        state.getDealer().setDealerHand(List.of(state.drawCard()));
+        state.getPlayer().getPlayerHand().addAll(List.of(state.drawCard(), state.drawCard()));
+        state.getDealer().getDealerHand().add(state.drawCard());
 
         // Calculate scores
         state.getPlayer().setScore(calculateHand(state.getPlayer().getPlayerHand()));
@@ -38,6 +43,13 @@ public class Game {
 
     public List<Card> getDealerHand() {
         return state.getDealer().getDealerHand();
+    }
+
+    public Card playerDraw() {
+        var card = state.drawCard();
+        state.getPlayer().draw(card);
+        state.getPlayer().setScore(calculateHand(state.getPlayer().getPlayerHand()));
+        return card;
     }
 
     public void play(int player) {

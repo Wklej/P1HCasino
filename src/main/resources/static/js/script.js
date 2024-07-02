@@ -76,7 +76,7 @@ async function startGame() {
         dealerCards = mapHand(dealerHandResponse)
         playerCards = mapHand(playerHandResponse)
 
-        updateState()
+        await updateState()
     } catch (err) {
         console.error('error starting game: ', err)
     }
@@ -89,18 +89,18 @@ function mapHand(hand) {
 /**
  * Each hit call would add one card from Deck to playerHand
  * 1. stompClient.send(/app/drawPlayer)
- *      a) update state with +1 player card
+ *      a) update state with +1 player card -- DONE
  *      b) ifBust() logic on backend
  *      c) backend returns boolean
  * 2. return == true ? updateState() + alert : updateState()
  */
-function hit() {
-    playerCards.push(getRandomCard());
-    updateState()
+async function hit() {
+    const drawnCard = await fetch("/playerDraw")
+        .then(response => response.json())
+    playerCards.push({value: drawnCard.value, rank: drawnCard.rank})
+    await updateState()
 
     if (playerScore > 21) {
-        updateState()
-
         setTimeout(() => {
             alert('Player busts! Dealer wins!');
             resetGame();
@@ -151,8 +151,8 @@ function resetGame() {
  * simply call backend to update scores - calculateHand()
  * renderCards()
  */
-function updateState() {
-    updateScores()
+async function updateState() {
+    await updateScores()
     renderCards()
 }
 

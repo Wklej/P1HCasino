@@ -18,7 +18,12 @@ public class Deck {
             Map.entry(RANK.ACE, 11)
     );
 
-    public Deck() {
+//    public Deck() {
+//        shuffleDeck();
+//    }
+
+    public void shuffleDeck() {
+        cards.clear();
         Arrays.stream(SUIT.values())
                 .forEach(suit ->
                         cardValues.forEach((k, v) ->

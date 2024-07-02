@@ -76,4 +76,9 @@ public class GameController {
     public List<Card> getDealerHand() {
         return game.getDealerHand();
     }
+
+    @GetMapping("/playerDraw")
+    public Card playerDraw() {
+        return game.playerDraw();
+    }
 }
