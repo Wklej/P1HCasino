@@ -3,6 +3,7 @@ package com.casinodemo.engine;
 import com.casinodemo.engine.objects.Card;
 import com.casinodemo.engine.objects.Dealer;
 import com.casinodemo.engine.objects.Deck;
+import com.casinodemo.engine.objects.enums.RANK;
 import lombok.Data;
 
 import java.util.List;
@@ -36,5 +37,34 @@ public class GameState {
 
     public Card drawCard() {
         return deck.dealCard();
+    }
+
+    public boolean checkBlackJack() {
+        return isBlackJack(player.getPlayerHand()) && !isBlackJack(dealer.getDealerHand());
+    }
+
+    public static Integer calculateHand(List<Card> hand) {
+        int sum = hand.stream()
+                .map(Card::value)
+                .reduce(0, Integer::sum);
+
+        long aceCount = hand.stream()
+                .filter(card -> card.rank() == RANK.ACE)
+                .count();
+
+        while (sum > 21 && aceCount > 0) {
+            sum -= 10;
+            aceCount--;
+        }
+
+        return sum;
+    }
+
+    private boolean isBust(int playerScore) {
+        return playerScore > 21;
+    }
+
+    public static boolean isBlackJack(List<Card> hand) {
+        return hand.size() == 2 && calculateHand(hand) == 21;
     }
 }

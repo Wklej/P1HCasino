@@ -77,6 +77,17 @@ async function startGame() {
         playerCards = mapHand(playerHandResponse)
 
         await updateState()
+
+        const isBJ = await fetch("/checkBlackJack")
+            .then(res => res.json())
+
+        if (isBJ) {
+            setTimeout(() => {
+                alert('Player has BlackJack! Player wins!');
+                resetGame();
+            }, 100)
+        }
+
     } catch (err) {
         console.error('error starting game: ', err)
     }

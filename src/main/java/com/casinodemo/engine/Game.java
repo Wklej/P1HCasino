@@ -6,6 +6,9 @@ import lombok.Getter;
 
 import java.util.List;
 
+import static com.casinodemo.engine.GameState.calculateHand;
+import static com.casinodemo.engine.GameState.isBlackJack;
+
 @Getter
 public class Game {
     private GameState state;
@@ -52,6 +55,10 @@ public class Game {
         return card;
     }
 
+    public boolean checkBlackJack() {
+        return state.checkBlackJack();
+    }
+
     public void play(int player) {
 //        var playerState = state.getPlayers().get(player);
 //        var playerScore = calculateHand(playerState.getPlayerHand());
@@ -88,22 +95,22 @@ public class Game {
 //        return new Result(checkWinner(), playerScore, dealerScore, playerHand, dealerHand);
     }
 
-    public static Integer calculateHand(List<Card> hand) {
-        int sum = hand.stream()
-                .map(Card::value)
-                .reduce(0, Integer::sum);
-
-        long aceCount = hand.stream()
-                .filter(card -> card.rank() == RANK.ACE)
-                .count();
-
-        while (sum > 21 && aceCount > 0) {
-            sum -= 10;
-            aceCount--;
-        }
-
-        return sum;
-    }
+//    public static Integer calculateHand(List<Card> hand) {
+//        int sum = hand.stream()
+//                .map(Card::value)
+//                .reduce(0, Integer::sum);
+//
+//        long aceCount = hand.stream()
+//                .filter(card -> card.rank() == RANK.ACE)
+//                .count();
+//
+//        while (sum > 21 && aceCount > 0) {
+//            sum -= 10;
+//            aceCount--;
+//        }
+//
+//        return sum;
+//    }
 
 //    private void dealerDraw(GameState state) {
 //        while (dealerScore <= 17) {
@@ -112,11 +119,11 @@ public class Game {
 //        }
 //    }
 
-    private boolean isBust(int playerScore) {
-        return playerScore > 21;
-    }
-
-    public static boolean isBlackJack(List<Card> hand) {
-        return hand.size() == 2 && calculateHand(hand) == 21;
-    }
+//    private boolean isBust(int playerScore) {
+//        return playerScore > 21;
+//    }
+//
+//    public static boolean isBlackJack(List<Card> hand) {
+//        return hand.size() == 2 && calculateHand(hand) == 21;
+//    }
 }

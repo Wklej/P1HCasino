@@ -78,4 +78,9 @@ public class GameController {
     public Card playerDraw() {
         return game.playerDraw();
     }
+
+    @GetMapping("/checkBlackJack")
+    public boolean checkBlackJack() {
+        return game.checkBlackJack();
+    }
 }
