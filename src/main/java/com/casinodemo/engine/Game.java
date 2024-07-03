@@ -59,6 +59,10 @@ public class Game {
         return state.checkBlackJack();
     }
 
+    public boolean isBust() {
+        return state.isBust(state.getPlayer().getScore());
+    }
+
     public void play(int player) {
 //        var playerState = state.getPlayers().get(player);
 //        var playerScore = calculateHand(playerState.getPlayerHand());

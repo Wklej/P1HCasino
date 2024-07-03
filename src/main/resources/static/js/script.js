@@ -111,7 +111,10 @@ async function hit() {
     playerCards.push({value: drawnCard.value, rank: drawnCard.rank})
     await updateState()
 
-    if (playerScore > 21) {
+    const playerBust = await fetch("/isBust")
+        .then(res => res.json())
+
+    if (playerBust) {
         setTimeout(() => {
             alert('Player busts! Dealer wins!');
             resetGame();

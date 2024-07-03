@@ -60,7 +60,7 @@ public class GameState {
         return sum;
     }
 
-    private boolean isBust(int playerScore) {
+    public boolean isBust(int playerScore) {
         return playerScore > 21;
     }
 

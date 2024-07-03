@@ -83,4 +83,9 @@ public class GameController {
     public boolean checkBlackJack() {
         return game.checkBlackJack();
     }
+
+    @GetMapping("/isBust")
+    public boolean isBust() {
+        return game.isBust();
+    }
 }
