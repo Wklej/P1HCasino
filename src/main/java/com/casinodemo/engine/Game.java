@@ -55,6 +55,19 @@ public class Game {
         return card;
     }
 
+    public Card dealerDraw() {
+        var card = state.drawCard();
+        state.getDealer().draw(card);
+        state.getDealer().setScore(calculateHand(state.getDealer().getDealerHand()));
+        return card;
+    }
+
+    public void stay() {
+        while (getDealerScore() <= 17) {
+            dealerDraw();
+        }
+    }
+
     public boolean checkBlackJack() {
         return state.checkBlackJack();
     }

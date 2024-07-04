@@ -128,13 +128,14 @@ async function hit() {
  * 2. updateState()
  * 3. returns winner (alert winner) + reset game
  */
-function stay() {
-    while (dealerScore < 17) {
-        dealerCards.push(getRandomCard());
-        updateState()
-    }
+async function stay() {
+    await fetch("/stay")
 
-    updateState()
+    const dealerHandResponse = await fetch("/getDealerHand")
+        .then(response => response.json())
+    dealerCards = mapHand(dealerHandResponse)
+
+    await updateState()
 
     setTimeout(() => {
         if (dealerScore > 21) {

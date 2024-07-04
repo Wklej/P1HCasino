@@ -18,4 +18,8 @@ public class Dealer {
     public void clearHand() {
         dealerHand.clear();
     }
+
+    public void draw(Card card) {
+        dealerHand.add(card);
+    }
 }

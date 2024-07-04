@@ -88,4 +88,9 @@ public class GameController {
     public boolean isBust() {
         return game.isBust();
     }
+
+    @GetMapping("/stay")
+    public void stay() {
+        game.stay();
+    }
 }

@@ -12,6 +12,7 @@ import java.util.List;
 public class GameState {
     private Deck deck;
 //    private List<Card> dealerHand;
+    //TODO: Player and Dealer class poly
     private Player player;
     private Dealer dealer;
     //TODO: later extend to multiplayer
