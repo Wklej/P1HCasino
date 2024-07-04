@@ -2,11 +2,12 @@
 const suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
 const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
 
-//TODO: move to GameState
-let dealerCards = [];
-let playerCards = [];
-let dealerScore = 0;
-let playerScore = 0;
+const gameState = {
+    dealerCards: [],
+    playerCards: [],
+    dealerScore: 0,
+    playerScore: 0,
+};
 
 const dealerCardsDiv = document.getElementById('dealer-cards');
 const dealerScoreDiv = document.getElementById('dealer-score');
@@ -34,30 +35,40 @@ function getCardValue(card) {
     return parseInt(card.value);
 }
 
+// Utility function for fetching data
+async function fetchData(url) {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Network response was not ok');
+        return await response.json();
+    } catch (error) {
+        console.error('Fetch error:', error);
+        throw error;
+    }
+}
+
 /**
  * Calculate hands for dealer and player + updating score div
  */
 async function updateScores() {
     // dealerScore = stompClient.send(/app/calculateHand) or something like that
-    dealerScore = await fetch("/getDealerScore")
-        .then(response => response.json())
-    playerScore = await fetch("/getPlayerScore")
-        .then(response => response.json())
+    gameState.dealerScore = await fetchData("/getDealerScore")
+    gameState.playerScore = await fetchData("/getPlayerScore")
 
     //original code - JS evaluation
     // dealerScore = dealerCards.reduce((sum, card) => sum + getCardValue(card), 0);
     // playerScore = playerCards.reduce((sum, card) => sum + getCardValue(card), 0);
 
-    dealerScoreDiv.innerText = `Score: ${dealerScore}`;
-    playerScoreDiv.innerText = `Score: ${playerScore}`;
+    dealerScoreDiv.innerText = `Score: ${gameState.dealerScore}`;
+    playerScoreDiv.innerText = `Score: ${gameState.playerScore}`;
 }
 
 /**
  * GET request hands then render them as below
  */
 function renderCards() {
-    dealerCardsDiv.innerHTML = dealerCards.map(card => `<div class="card">${card.value}</div>`).join('');
-    playerCardsDiv.innerHTML = playerCards.map(card => `<div class="card">${card.value}</div>`).join('');
+    dealerCardsDiv.innerHTML = gameState.dealerCards.map(card => `<div class="card">${card.value}</div>`).join('');
+    playerCardsDiv.innerHTML = gameState.playerCards.map(card => `<div class="card">${card.value}</div>`).join('');
 }
 
 /**
@@ -68,26 +79,21 @@ async function startGame() {
     try {
         await fetch("/start")
 
-        const dealerHandResponse = await fetch("/getDealerHand")
-            .then(response => response.json())
-        const playerHandResponse = await fetch("/getPlayerHand")
-            .then(response => response.json())
+        const dealerHandResponse = await fetchData("/getDealerHand");
+        const playerHandResponse = await fetchData("/getPlayerHand");
 
-        dealerCards = mapHand(dealerHandResponse)
-        playerCards = mapHand(playerHandResponse)
+        gameState.dealerCards = mapHand(dealerHandResponse);
+        gameState.playerCards = mapHand(playerHandResponse);
 
         await updateState()
 
-        const isBJ = await fetch("/checkBlackJack")
-            .then(res => res.json())
-
+        const isBJ = await fetchData("/checkBlackJack")
         if (isBJ) {
             setTimeout(() => {
                 alert('Player has BlackJack! Player wins!');
                 resetGame();
             }, 100)
         }
-
     } catch (err) {
         console.error('error starting game: ', err)
     }
@@ -106,14 +112,12 @@ function mapHand(hand) {
  * 2. return == true ? updateState() + alert : updateState()
  */
 async function hit() {
-    const drawnCard = await fetch("/playerDraw")
-        .then(response => response.json())
-    playerCards.push({value: drawnCard.value, rank: drawnCard.rank})
+    const drawnCard = await fetchData("/playerDraw")
+    gameState.playerCards.push({value: drawnCard.value, rank: drawnCard.rank})
+
     await updateState()
 
-    const playerBust = await fetch("/isBust")
-        .then(res => res.json())
-
+    const playerBust = await fetchData("/isBust")
     if (playerBust) {
         setTimeout(() => {
             alert('Player busts! Dealer wins!');
@@ -131,18 +135,17 @@ async function hit() {
 async function stay() {
     await fetch("/stay")
 
-    const dealerHandResponse = await fetch("/getDealerHand")
-        .then(response => response.json())
-    dealerCards = mapHand(dealerHandResponse)
+    const dealerHandResponse = await fetchData("/getDealerHand")
+    gameState.dealerCards = mapHand(dealerHandResponse)
 
     await updateState()
 
     setTimeout(() => {
-        if (dealerScore > 21) {
+        if (gameState.dealerScore > 21) {
             alert('Dealer busts! Player wins!');
-        } else if (dealerScore > playerScore) {
+        } else if (gameState.dealerScore > gameState.playerScore) {
             alert('Dealer wins!');
-        } else if (dealerScore === playerScore) {
+        } else if (gameState.dealerScore === gameState.playerScore) {
             alert('Draw!')
         } else {
             alert('Player wins!');
@@ -155,10 +158,10 @@ async function stay() {
  * Resets GameState hands and scores + start new game
  */
 function resetGame() {
-    dealerCards = [];
-    playerCards = [];
-    dealerScore = 0;
-    playerScore = 0;
+    gameState.dealerCards = [];
+    gameState.playerCards = [];
+    gameState.dealerScore = 0;
+    gameState.playerScore = 0;
     startGame();
 }
 
