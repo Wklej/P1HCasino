@@ -1,7 +1,7 @@
 package com.casinodemo.engine.objects;
 
-import com.czarnyjacek.objects.enums.RANK;
-import com.czarnyjacek.objects.enums.SUIT;
+import com.casinodemo.engine.objects.enums.RANK;
+import com.casinodemo.engine.objects.enums.SUIT;
 import lombok.Getter;
 
 import java.util.*;
@@ -18,7 +18,12 @@ public class Deck {
             Map.entry(RANK.ACE, 11)
     );
 
-    public Deck() {
+//    public Deck() {
+//        shuffleDeck();
+//    }
+
+    public void shuffleDeck() {
+        cards.clear();
         Arrays.stream(SUIT.values())
                 .forEach(suit ->
                         cardValues.forEach((k, v) ->
@@ -28,6 +33,7 @@ public class Deck {
     }
 
     public Card dealCard() {
+        System.out.println(cards.size());
         return cards.removeFirst();
     }
 }
