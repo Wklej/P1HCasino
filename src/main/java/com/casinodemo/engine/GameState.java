@@ -17,7 +17,6 @@ public class GameState {
     private Deck deck;
     //TODO: Player and Dealer class poly
     private Dealer dealer;
-    //TODO: later extend to multiplayer
     private List<Player> players;
 //    private List<Player> waitingPlayers;
     boolean inProgress;
@@ -28,11 +27,6 @@ public class GameState {
         players = new ArrayList<>();
     }
 
-//        public void resetHands() {
-//        dealerHand.clear();
-//        players.forEach(Player::clearHand);
-//    }
-//
 //    public void joinWaitingPlayers() {
 //        players.addAll(waitingPlayers);
 //        waitingPlayers.clear();
@@ -48,15 +42,7 @@ public class GameState {
                 .filter(hasBlackJack())
                 .map(Player::getName)
                 .toList());
-//        players.forEach(player -> {
-//            if (isBlackJack(getPlayerByName(player.getName()).get().getPlayerHand())
-//                    && !isBlackJack(dealer.getDealerHand())) {
-//                BJs.add(player.getName());
-//            }
-//        });
 
-//        return isBlackJack(getPlayerByName(name).get().getPlayerHand())
-//                && !isBlackJack(dealer.getDealerHand());
         return BJs;
     }
 

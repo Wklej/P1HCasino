@@ -14,9 +14,6 @@ import java.util.Map;
 
 @RestController
 public class GameController {
-
-//    private List<String> players = new ArrayList<>();
-
     private Game game;
     private final SimpMessagingTemplate messagingTemplate;
 
@@ -31,12 +28,6 @@ public class GameController {
         game.joinNewPlayer();
         return game.getState().getPlayers();
     }
-//
-//    @GetMapping("/players")
-//    @MessageMapping("/app/players")
-//    public List<String> getPlayers() {
-//        return players;
-//    }
 
     @MessageMapping("/start")
     public void startGame() {
