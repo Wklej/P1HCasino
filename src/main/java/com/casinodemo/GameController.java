@@ -55,7 +55,7 @@ public class GameController {
     }
 
     @GetMapping("/checkBlackJack")
-    public boolean checkBlackJack() {
+    public List<String> checkBlackJack() {
         return game.checkBlackJack();
     }
 

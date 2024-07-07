@@ -24,13 +24,22 @@ public class Game {
         state.getDealer().clearHand();
         state.getDeck().shuffleDeck();
 
+        state.getPlayers().forEach(Player::clearHand);
+
         // Init hands
         state.getPlayer().getPlayerHand().addAll(List.of(state.drawCard(), state.drawCard()));
         state.getDealer().getDealerHand().add(state.drawCard());
 
+        state.getPlayers().forEach(player -> {
+                player.getPlayerHand()
+                        .addAll((List.of(state.drawCard(), state.drawCard())));
+                player.setScore(calculateHand(player.getPlayerHand()));
+                });
+
         // Calculate scores
         state.getPlayer().setScore(calculateHand(state.getPlayer().getPlayerHand()));
         state.getDealer().setScore(calculateHand(state.getDealer().getDealerHand()));
+
     }
 
     public int getPlayerScore() {
@@ -69,7 +78,7 @@ public class Game {
         }
     }
 
-    public boolean checkBlackJack() {
+    public List<String> checkBlackJack() {
         return state.checkBlackJack();
     }
 

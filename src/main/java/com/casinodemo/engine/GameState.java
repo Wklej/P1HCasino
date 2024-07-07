@@ -8,12 +8,15 @@ import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 @Data
 public class GameState {
     private Deck deck;
     //TODO: Player and Dealer class poly
-    private Player player;
+    private Player player; //TODO: to remove
     private Dealer dealer;
     //TODO: later extend to multiplayer
     private List<Player> players;
@@ -22,8 +25,8 @@ public class GameState {
 
     public GameState() {
         deck = new Deck();
-        player = new Player();
         dealer = new Dealer();
+        player = new Player();
         players = new ArrayList<>();
     }
 
@@ -41,8 +44,22 @@ public class GameState {
         return deck.dealCard();
     }
 
-    public boolean checkBlackJack() {
-        return isBlackJack(player.getPlayerHand()) && !isBlackJack(dealer.getDealerHand());
+    public List<String> checkBlackJack() {
+        var BJs = new ArrayList<String>();
+        BJs.addAll(players.stream()
+                .filter(hasBlackJack())
+                .map(Player::getName)
+                .toList());
+//        players.forEach(player -> {
+//            if (isBlackJack(getPlayerByName(player.getName()).get().getPlayerHand())
+//                    && !isBlackJack(dealer.getDealerHand())) {
+//                BJs.add(player.getName());
+//            }
+//        });
+
+//        return isBlackJack(getPlayerByName(name).get().getPlayerHand())
+//                && !isBlackJack(dealer.getDealerHand());
+        return BJs;
     }
 
     public static Integer calculateHand(List<Card> hand) {
@@ -68,5 +85,16 @@ public class GameState {
 
     public static boolean isBlackJack(List<Card> hand) {
         return hand.size() == 2 && calculateHand(hand) == 21;
+    }
+
+    private Optional<Player> getPlayerByName(String name) {
+        return players.stream()
+                .filter(player -> Objects.equals(player.getName(), name))
+                .findFirst();
+    }
+
+    private Predicate<Player> hasBlackJack() {
+        return player -> isBlackJack(getPlayerByName(player.getName()).get().getPlayerHand())
+                && !isBlackJack(dealer.getDealerHand());
     }
 }

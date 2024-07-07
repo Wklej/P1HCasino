@@ -7,6 +7,7 @@ const gameState = {
     playerCards: [],
     dealerScore: 0,
     playerScore: 0,
+    players: []
 };
 
 const dealerCardsDiv = document.getElementById('dealer-cards');
@@ -32,10 +33,12 @@ function connect() {
             const players = JSON.parse(message.body)
             updatePlayers(players);
         })
-        startGame();
         setTimeout(() => {
             stompClient.send("/app/join", {}, {})
-        }, 100)
+        }, 300)
+        setTimeout(() => {
+            startGame()
+        }, 500)
     });
 }
 
@@ -60,13 +63,16 @@ function startGame() {
     //check for BJ
     fetch("/checkBlackJack")
         .then(res => res.json())
-        .then(isBJ => {
-            if (isBJ) {
-                setTimeout(() => {
-                    alert('Player has BlackJack! Player wins!');
-                    resetGame();
-                }, 100)
-            }
+        .then(BJs => {
+            BJs.forEach(playerName => {
+                setTimeout(() => alert(`Player ${playerName} has BlackJack!`))
+            }, 100)
+            // if (isBJ) {
+            //     setTimeout(() => {
+            //         alert('Player has BlackJack! Player wins!');
+            //         // resetGame();
+            //     }, 100)
+            // }
         })
 }
 
@@ -132,7 +138,7 @@ function updatePlayers(players) {
 
         playersDiv.appendChild(newPlayer)
     })
-    updateUI(players)
+    // updateUI(players)
 }
 
 hitButton.addEventListener('click', hit);
