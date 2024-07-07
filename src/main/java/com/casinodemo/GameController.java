@@ -3,12 +3,14 @@ package com.casinodemo;
 import com.casinodemo.engine.Game;
 import com.casinodemo.engine.Player;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class GameController {
@@ -43,8 +45,9 @@ public class GameController {
     }
 
     @MessageMapping("/hit")
-    public void playerHit() {
-        game.playerDraw();
+    public void playerHit(@Payload Map<String, String> payload) {
+        var playerName = payload.get("playerName");
+        game.playerDraw(playerName);
         broadcastGameState();
     }
 
@@ -60,7 +63,7 @@ public class GameController {
     }
 
     @GetMapping("/isBust")
-    public boolean isBust() {
+    public List<String> isBust() {
         return game.isBust();
     }
 

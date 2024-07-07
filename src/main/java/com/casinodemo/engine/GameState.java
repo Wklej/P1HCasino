@@ -16,7 +16,6 @@ import java.util.function.Predicate;
 public class GameState {
     private Deck deck;
     //TODO: Player and Dealer class poly
-    private Player player; //TODO: to remove
     private Dealer dealer;
     //TODO: later extend to multiplayer
     private List<Player> players;
@@ -26,7 +25,6 @@ public class GameState {
     public GameState() {
         deck = new Deck();
         dealer = new Dealer();
-        player = new Player();
         players = new ArrayList<>();
     }
 
@@ -79,15 +77,18 @@ public class GameState {
         return sum;
     }
 
-    public boolean isBust(int playerScore) {
-        return playerScore > 21;
+    public List<String> isBust() {
+        return players.stream()
+                .filter(isPlayerBust())
+                .map(Player::getName)
+                .toList();
     }
 
     public static boolean isBlackJack(List<Card> hand) {
         return hand.size() == 2 && calculateHand(hand) == 21;
     }
 
-    private Optional<Player> getPlayerByName(String name) {
+    public Optional<Player> getPlayerByName(String name) {
         return players.stream()
                 .filter(player -> Objects.equals(player.getName(), name))
                 .findFirst();
@@ -96,5 +97,9 @@ public class GameState {
     private Predicate<Player> hasBlackJack() {
         return player -> isBlackJack(getPlayerByName(player.getName()).get().getPlayerHand())
                 && !isBlackJack(dealer.getDealerHand());
+    }
+
+    private Predicate<Player> isPlayerBust() {
+        return player -> player.getScore() > 21;
     }
 }

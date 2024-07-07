@@ -1,8 +1,8 @@
 function updateGameState(game) {
-    gameState.dealerCards = mapHand(game.dealerHand);
-    gameState.playerCards = mapHand(game.playerHand);
-    gameState.dealerScore = game.dealerScore;
-    gameState.playerScore = game.playerScore;
+    gameState.dealerCards = mapHand(game.state.dealer.dealerHand);
+    // gameState.playerCards = mapHand(game.playerHand);
+    gameState.dealerScore = game.state.dealer.score;
+    // gameState.playerScore = game.playerScore;
 
     updatePlayersState(game.state.players)
 

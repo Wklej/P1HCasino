@@ -19,50 +19,31 @@ public class Game {
     }
 
     public void start() {
-        // Reset hands
-        state.getPlayer().clearHand();
+        // Reset
         state.getDealer().clearHand();
+        state.getPlayers().forEach(Player::clearHand);
         state.getDeck().shuffleDeck();
 
-        state.getPlayers().forEach(Player::clearHand);
 
-        // Init hands
-        state.getPlayer().getPlayerHand().addAll(List.of(state.drawCard(), state.drawCard()));
+        // Init hands and scores
         state.getDealer().getDealerHand().add(state.drawCard());
-
+        state.getDealer().setScore(calculateHand(state.getDealer().getDealerHand()));
         state.getPlayers().forEach(player -> {
                 player.getPlayerHand()
                         .addAll((List.of(state.drawCard(), state.drawCard())));
                 player.setScore(calculateHand(player.getPlayerHand()));
                 });
-
-        // Calculate scores
-        state.getPlayer().setScore(calculateHand(state.getPlayer().getPlayerHand()));
-        state.getDealer().setScore(calculateHand(state.getDealer().getDealerHand()));
-
-    }
-
-    public int getPlayerScore() {
-        return state.getPlayer().getScore();
     }
 
     public int getDealerScore() {
         return state.getDealer().getScore();
     }
 
-    public List<Card> getPlayerHand() {
-        return state.getPlayer().getPlayerHand();
-    }
-
-    public List<Card> getDealerHand() {
-        return state.getDealer().getDealerHand();
-    }
-
-    public Card playerDraw() {
+    public void playerDraw(String name) {
         var card = state.drawCard();
-        state.getPlayer().draw(card);
-        state.getPlayer().setScore(calculateHand(state.getPlayer().getPlayerHand()));
-        return card;
+        var player = state.getPlayerByName(name).get();
+        player.draw(card);
+        player.setScore(calculateHand(player.getPlayerHand()));
     }
 
     public Card dealerDraw() {
@@ -82,8 +63,8 @@ public class Game {
         return state.checkBlackJack();
     }
 
-    public boolean isBust() {
-        return state.isBust(state.getPlayer().getScore());
+    public List<String> isBust() {
+        return state.isBust();
     }
 
     public void joinNewPlayer() {
