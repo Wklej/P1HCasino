@@ -32,8 +32,10 @@ function connect() {
             const players = JSON.parse(message.body)
             updatePlayers(players);
         })
-        stompClient.send("/app/join", {}, {})
         startGame();
+        setTimeout(() => {
+            stompClient.send("/app/join", {}, {})
+        }, 100)
     });
 }
 
@@ -130,6 +132,7 @@ function updatePlayers(players) {
 
         playersDiv.appendChild(newPlayer)
     })
+    updateUI(players)
 }
 
 hitButton.addEventListener('click', hit);
