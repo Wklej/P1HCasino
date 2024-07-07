@@ -6,17 +6,17 @@ import com.casinodemo.engine.objects.Deck;
 import com.casinodemo.engine.objects.enums.RANK;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
 public class GameState {
     private Deck deck;
-//    private List<Card> dealerHand;
     //TODO: Player and Dealer class poly
     private Player player;
     private Dealer dealer;
     //TODO: later extend to multiplayer
-//    private List<Player> players;
+    private List<Player> players;
 //    private List<Player> waitingPlayers;
     boolean inProgress;
 
@@ -24,13 +24,14 @@ public class GameState {
         deck = new Deck();
         player = new Player();
         dealer = new Dealer();
+        players = new ArrayList<>();
     }
 
-    //    public void resetHands() {
+//        public void resetHands() {
 //        dealerHand.clear();
 //        players.forEach(Player::clearHand);
 //    }
-
+//
 //    public void joinWaitingPlayers() {
 //        players.addAll(waitingPlayers);
 //        waitingPlayers.clear();

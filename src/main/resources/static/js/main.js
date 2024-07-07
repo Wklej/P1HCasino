@@ -28,6 +28,11 @@ function connect() {
             const game = JSON.parse(message.body);
             updateGameState(game);
         });
+        stompClient.subscribe("/topic/players", function (message) {
+            const players = JSON.parse(message.body)
+            updatePlayers(players);
+        })
+        stompClient.send("/app/join", {}, {})
         startGame();
     });
 }
@@ -101,6 +106,30 @@ function resetGame() {
     gameState.dealerScore = 0;
     gameState.playerScore = 0;
     startGame();
+}
+
+function updatePlayers(players) {
+    const playersDiv = document.getElementById("players")
+    playersDiv.innerText = ""
+
+    players.forEach(player => {
+        const newPlayer = document.createElement("div")
+        newPlayer.id = `player ${player.name}`
+        const heading = document.createElement("h2");
+        heading.innerText = `PLAYER ${player.name}`
+        const cardsDiv = document.createElement("div")
+        cardsDiv.id = `player-cards-${player.name}`
+        cardsDiv.className = "cards"
+        const scoreDiv = document.createElement("div")
+        scoreDiv.id = `player-score-${player.name}`
+        scoreDiv.innerText = "Score: 0"
+
+        newPlayer.appendChild(heading);
+        newPlayer.appendChild(cardsDiv)
+        newPlayer.appendChild(scoreDiv)
+
+        playersDiv.appendChild(newPlayer)
+    })
 }
 
 hitButton.addEventListener('click', hit);

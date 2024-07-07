@@ -13,9 +13,15 @@ public class Player {
     private Double balance;
     private boolean isReady;
     private boolean win;
+    private String name;
 
     public Player() {
         playerHand = new ArrayList<>();
+    }
+
+    public Player(int name) {
+        playerHand = new ArrayList<>();
+        this.name = String.valueOf(name);
     }
 
     public void clearHand() {

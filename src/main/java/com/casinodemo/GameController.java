@@ -1,10 +1,14 @@
 package com.casinodemo;
 
 import com.casinodemo.engine.Game;
+import com.casinodemo.engine.Player;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 public class GameController {
@@ -19,14 +23,12 @@ public class GameController {
         game = new Game();
     }
 
-//
-//    @MessageMapping("/join")
-//    @SendTo("/topic/players")
-//    public List<String> joinGame(String playerName) {
-//        players.add(playerName);
-//        return players;
-////        template.convertAndSend("/topic/players", players);
-//    }
+    @MessageMapping("/join")
+    @SendTo("/topic/players")
+    public List<Player> joinGame() {
+        game.joinNewPlayer();
+        return game.getState().getPlayers();
+    }
 //
 //    @GetMapping("/players")
 //    @MessageMapping("/app/players")

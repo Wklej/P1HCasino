@@ -5,6 +5,7 @@ import com.casinodemo.engine.objects.enums.RANK;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Random;
 
 import static com.casinodemo.engine.GameState.calculateHand;
 import static com.casinodemo.engine.GameState.isBlackJack;
@@ -74,6 +75,10 @@ public class Game {
 
     public boolean isBust() {
         return state.isBust(state.getPlayer().getScore());
+    }
+
+    public void joinNewPlayer() {
+        state.getPlayers().add(new Player(new Random().nextInt(10)));
     }
 
     public void play(int player) {
