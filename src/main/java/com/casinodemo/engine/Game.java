@@ -61,8 +61,8 @@ public class Game {
         return state.checkBlackJack();
     }
 
-    public List<String> isBust() {
-        return state.isBust();
+    public boolean isBust(String name) {
+        return state.isBust(name);
     }
 
     public void joinNewPlayer() {

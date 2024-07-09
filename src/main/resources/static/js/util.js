@@ -11,7 +11,7 @@ function updateGameState(game) {
 
 function updatePlayersState(players) {
     for (let i = 0; i < players.length; i++) {
-        gameState.players[i] = {hand: mapHand(players[i].playerHand), score: players[i].score}
+        gameState.players[i] = {hand: mapHand(players[i].playerHand), score: players[i].score, name: players[i].name}
     }
 }
 
@@ -65,6 +65,27 @@ function updatePlayers(players) {
 
 function mapHand(hand) {
     return hand.map(card => ({ value: card.value, rank: card.rank }));
+}
+
+function gameResult() {
+    const winners = []
+    const losers = []
+    const draws = []
+
+    gameState.players.forEach(player => {
+        if (player.score > 21) {
+            losers.push(player.name)
+        } else if (gameState.dealerScore > 21) {
+            winners.push(player.name)
+        } else if (gameState.dealerScore > player.score) {
+            losers.push(player.name)
+        } else if (gameState.dealerScore < player.score) {
+            winners.push(player.name)
+        } else {
+            draws.push(player.name)
+        }
+    })
+    return {winners: winners, losers: losers, draws: draws}
 }
 
 async function fetchData(url) {

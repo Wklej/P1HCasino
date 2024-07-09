@@ -54,8 +54,8 @@ public class GameController {
     }
 
     @GetMapping("/isBust")
-    public List<String> isBust() {
-        return game.isBust();
+    public boolean isBust(String name) {
+        return game.isBust(name);
     }
 
     private void broadcastGameState() {

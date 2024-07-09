@@ -63,11 +63,10 @@ public class GameState {
         return sum;
     }
 
-    public List<String> isBust() {
+    public boolean isBust(String name) {
         return players.stream()
-                .filter(isPlayerBust())
-                .map(Player::getName)
-                .toList();
+                .filter(player -> Objects.equals(player.getName(), name))
+                .anyMatch(isPlayerBust());
     }
 
     public static boolean isBlackJack(List<Card> hand) {

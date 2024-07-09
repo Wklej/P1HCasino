@@ -56,15 +56,10 @@ function hit(event) {
     stompClient.send("/app/hit", {}, JSON.stringify({playerName: playerName}));
 
     setTimeout(() => {
-        fetch("/isBust")
+        fetch(`/isBust?name=${encodeURIComponent(playerName)}`)
             .then(res => res.json())
-            .then(busts => {
-                busts.forEach(playerName => {
-                    setTimeout(() => {
-                        alert(`Player ${playerName} busts! Dealer wins with ${playerName}!`);
-                        // resetGame();
-                    }, 100)
-                })
+            .then(isBust => {
+                isBust ? console.log("TODO: block further drawing, player busted") : console.log("Player didnt bust...")
             })
     }, 200)
 }
@@ -73,15 +68,10 @@ function stay() {
     stompClient.send("/app/stay", {}, {});
 
     setTimeout(() => {
-        if (gameState.dealerScore > 21) {
-            alert('Dealer busts! Player wins!');
-        } else if (gameState.dealerScore > gameState.playerScore) {
-            alert('Dealer wins!');
-        } else if (gameState.dealerScore === gameState.playerScore) {
-            alert('Draw!')
-        } else {
-            alert('Player wins!');
-        }
+        const result = gameResult()
+        alert(` Winners: ${result.winners}
+                Losers: ${result.losers}
+                Draws: ${result.draws}`)
         resetGame();
     }, 100)
 }
