@@ -21,7 +21,7 @@ public class Game {
         state.getDealer().clearHand();
         state.getPlayers().forEach(Player::clearHand);
         state.getDeck().shuffleDeck();
-
+        state.getPlayers().forEach(player -> player.setFinished(false));
 
         // Init hands and scores
         state.getDealer().getDealerHand().add(state.drawCard());
@@ -51,10 +51,16 @@ public class Game {
         return card;
     }
 
-    public void stay() {
-        while (getDealerScore() <= 17) {
-            dealerDraw();
+    public boolean stay(String playerName) {
+        state.getPlayerByName(playerName).get().setFinished(true);
+        var playersAreDone = state.getPlayers().stream()
+                .allMatch(Player::isFinished);
+        if (playersAreDone) {
+            while (getDealerScore() <= 17) {
+                dealerDraw();
+            }
         }
+        return playersAreDone;
     }
 
     public List<String> checkBlackJack() {
@@ -66,6 +72,6 @@ public class Game {
     }
 
     public void joinNewPlayer() {
-        state.getPlayers().add(new Player(new Random().nextInt(10)));
+        state.getPlayers().add(new Player(new Random().nextInt(100)));
     }
 }

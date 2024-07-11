@@ -14,6 +14,7 @@ public class Player {
     private boolean isReady;
     private boolean win;
     private String name;
+    private boolean isFinished;
 
     public Player() {
         playerHand = new ArrayList<>();

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 public class GameController {
@@ -43,9 +44,13 @@ public class GameController {
     }
 
     @MessageMapping("/stay")
-    public void playerStay() {
-        game.stay();
+    public void playerStay(@Payload Map<String, String> payload) {
+        var playerName = payload.get("playerName");
+        var playersAreDone = game.stay(playerName);
         broadcastGameState();
+        if (playersAreDone) {
+            broadcastPlayersDone();
+        }
     }
 
     @GetMapping("/checkBlackJack")
@@ -60,5 +65,9 @@ public class GameController {
 
     private void broadcastGameState() {
         messagingTemplate.convertAndSend("/topic/game", game);
+    }
+
+    private void broadcastPlayersDone() {
+        messagingTemplate.convertAndSend("/topic/gameResult", Optional.empty());
     }
 }

@@ -26,6 +26,9 @@ function connect() {
             const players = JSON.parse(message.body)
             updatePlayers(players);
         })
+        stompClient.subscribe("/topic/gameResult", function () {
+            gameResults()
+        })
         setTimeout(() => {
             stompClient.send("/app/join", {}, {})
         }, 300)
@@ -64,16 +67,20 @@ function hit(event) {
     }, 200)
 }
 
-function stay() {
-    stompClient.send("/app/stay", {}, {});
+function stay(event) {
+    const playerName = event.target.id
+    // event.target.disabled = true
+    stompClient.send("/app/stay", {}, JSON.stringify({playerName: playerName}));
+}
 
+function gameResults() {
     setTimeout(() => {
         const result = gameResult()
         alert(` Winners: ${result.winners}
                 Losers: ${result.losers}
                 Draws: ${result.draws}`)
         resetGame();
-    }, 100)
+    }, 300)
 }
 
 function resetGame() {
