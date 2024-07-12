@@ -29,12 +29,17 @@ function connect() {
         stompClient.subscribe("/topic/gameResult", function () {
             gameResults()
         })
+        stompClient.subscribe("/topic/ready", function (message) {
+            const allPlayersReady = JSON.parse(message.body)
+            if (allPlayersReady) {
+                setTimeout(() => {
+                    startGame()
+                }, 500)
+            }
+        })
         setTimeout(() => {
             stompClient.send("/app/join", {}, {})
         }, 300)
-        setTimeout(() => {
-            startGame()
-        }, 500)
     });
 }
 
@@ -62,7 +67,7 @@ function hit(event) {
         fetch(`/isBust?name=${encodeURIComponent(playerName)}`)
             .then(res => res.json())
             .then(isBust => {
-                isBust ? console.log("TODO: block further drawing, player busted") : console.log("Player didnt bust...")
+                isBust ? console.log("TODO: send stay command + block hit button") : console.log("Player didnt bust...")
             })
     }, 200)
 }
@@ -81,6 +86,11 @@ function gameResults() {
                 Draws: ${result.draws}`)
         resetGame();
     }, 300)
+}
+
+function ready(event) {
+    var playerName = event.target.id
+    stompClient.send("/app/ready", {}, JSON.stringify({playerName: playerName}));
 }
 
 function resetGame() {

@@ -53,6 +53,15 @@ public class GameController {
         }
     }
 
+    @MessageMapping("/ready")
+    public void ready(@Payload Map<String, String> payload) {
+        var playerName = payload.get("playerName");
+        var allPlayersReady = game.setPlayerReady(playerName);
+        if (allPlayersReady) {
+            broadcastReady();
+        }
+    }
+
     @GetMapping("/checkBlackJack")
     public List<String> checkBlackJack() {
         return game.checkBlackJack();
@@ -69,5 +78,9 @@ public class GameController {
 
     private void broadcastPlayersDone() {
         messagingTemplate.convertAndSend("/topic/gameResult", Optional.empty());
+    }
+
+    private void broadcastReady() {
+        messagingTemplate.convertAndSend("/topic/ready", true);
     }
 }

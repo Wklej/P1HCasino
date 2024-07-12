@@ -53,11 +53,17 @@ function updatePlayers(players) {
         stayButton.addEventListener('click', stay)
         stayButton.innerText = "Stay"
 
+        const readyButton = document.createElement("button")
+        readyButton.id = `${player.name}`
+        readyButton.addEventListener('click', ready)
+        readyButton.innerText = "Ready"
+
         newPlayer.appendChild(heading);
         newPlayer.appendChild(cardsDiv)
         newPlayer.appendChild(scoreDiv)
         newPlayer.appendChild(hitButton)
         newPlayer.appendChild(stayButton)
+        newPlayer.appendChild(readyButton)
 
         playersDiv.appendChild(newPlayer)
     })

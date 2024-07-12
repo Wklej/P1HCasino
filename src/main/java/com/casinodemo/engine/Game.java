@@ -74,4 +74,10 @@ public class Game {
     public void joinNewPlayer() {
         state.getPlayers().add(new Player(new Random().nextInt(100)));
     }
+
+    public boolean setPlayerReady(String playerName) {
+        state.getPlayerByName(playerName).get().setReady(true);
+        return state.getPlayers().stream()
+                .allMatch(Player::isReady);
+    }
 }

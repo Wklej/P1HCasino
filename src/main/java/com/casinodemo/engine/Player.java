@@ -23,6 +23,7 @@ public class Player {
     public Player(int name) {
         playerHand = new ArrayList<>();
         this.name = String.valueOf(name);
+        this.isReady = false;
     }
 
     public void clearHand() {
