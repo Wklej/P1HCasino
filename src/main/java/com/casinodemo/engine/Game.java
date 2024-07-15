@@ -21,7 +21,11 @@ public class Game {
         state.getDealer().clearHand();
         state.getPlayers().forEach(Player::clearHand);
         state.getDeck().shuffleDeck();
-        state.getPlayers().forEach(player -> player.setFinished(false));
+        state.getPlayers().forEach(player -> {
+            player.setFinished(false);
+            player.setReady(false);
+        });
+
 
         // Init hands and scores
         state.getDealer().getDealerHand().add(state.drawCard());
