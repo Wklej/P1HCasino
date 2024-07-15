@@ -94,6 +94,14 @@ function gameResult() {
     return {winners: winners, losers: losers, draws: draws}
 }
 
+function resetUI() {
+    gameState.players.forEach(player => {
+        player.score = 0
+        player.hand = []
+    })
+    updateUI(gameState.players)
+}
+
 async function fetchData(url) {
     try {
         const response = await fetch(url);
