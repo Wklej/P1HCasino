@@ -18,13 +18,15 @@ public class GameState {
     //TODO: Player and Dealer class poly
     private Dealer dealer;
     private List<Player> players;
-//    private List<Player> waitingPlayers;
+    private List<Player> waitingPlayers;
     boolean inProgress;
 
     public GameState() {
         deck = new Deck();
         dealer = new Dealer();
         players = new ArrayList<>();
+        waitingPlayers = new ArrayList<>();
+        inProgress = false;
     }
 
 //    public void joinWaitingPlayers() {

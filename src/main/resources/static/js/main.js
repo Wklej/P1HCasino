@@ -99,6 +99,7 @@ function resetGame() {
     gameState.dealerScore = 0;
     gameState.playerScore = 0;
     gameState.players = []
+    //resetUI ?
     startGame();
 }
 

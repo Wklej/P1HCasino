@@ -50,6 +50,7 @@ public class GameController {
         broadcastGameState();
         if (playersAreDone) {
             broadcastPlayersDone();
+            game.getState().setInProgress(false);
         }
     }
 
@@ -58,6 +59,7 @@ public class GameController {
         var playerName = payload.get("playerName");
         var allPlayersReady = game.setPlayerReady(playerName);
         if (allPlayersReady) {
+            game.getState().setInProgress(true);
             broadcastReady();
         }
     }
@@ -82,5 +84,10 @@ public class GameController {
 
     private void broadcastReady() {
         messagingTemplate.convertAndSend("/topic/ready", true);
+    }
+
+    @GetMapping("/inProgress")
+    public boolean inProgress() {
+        return game.getState().isInProgress();
     }
 }
