@@ -1,16 +1,21 @@
 package com.casinodemo;
 
 import com.casinodemo.engine.Game;
+import com.casinodemo.engine.Player;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 @RestController
 public class GameController {
-
-//    private List<String> players = new ArrayList<>();
-
     private Game game;
     private final SimpMessagingTemplate messagingTemplate;
 
@@ -19,20 +24,17 @@ public class GameController {
         game = new Game();
     }
 
-//
-//    @MessageMapping("/join")
-//    @SendTo("/topic/players")
-//    public List<String> joinGame(String playerName) {
-//        players.add(playerName);
-//        return players;
-////        template.convertAndSend("/topic/players", players);
-//    }
-//
-//    @GetMapping("/players")
-//    @MessageMapping("/app/players")
-//    public List<String> getPlayers() {
-//        return players;
-//    }
+    @MessageMapping("/join")
+    @SendTo("/topic/players")
+    public List<Player> joinGame() {
+        if (game.getState().isInProgress()) {
+            game.addPlayerToWaitingRoom();
+            return Collections.emptyList();
+        } else {
+            game.joinNewPlayer();
+            return game.getState().getPlayers();
+        }
+    }
 
     @MessageMapping("/start")
     public void startGame() {
@@ -41,28 +43,67 @@ public class GameController {
     }
 
     @MessageMapping("/hit")
-    public void playerHit() {
-        game.playerDraw();
+    public void playerHit(@Payload Map<String, String> payload) {
+        var playerName = payload.get("playerName");
+        game.playerDraw(playerName);
         broadcastGameState();
     }
 
     @MessageMapping("/stay")
-    public void playerStay() {
-        game.stay();
+    public void playerStay(@Payload Map<String, String> payload) {
+        var playerName = payload.get("playerName");
+        var playersAreDone = game.stay(playerName);
+        if (playersAreDone) {
+            broadcastPlayersDone();
+            game.getState().setInProgress(false);
+
+            //When players done, check waiting room and join waiting players
+            if (!game.getState().getWaitingPlayers().isEmpty()) {
+                broadcastUpdatePlayers(game.getState().joinWaitingPlayers());
+            }
+        }
+
         broadcastGameState();
     }
 
+    @MessageMapping("/ready")
+    public void ready(@Payload Map<String, String> payload) {
+        var playerName = payload.get("playerName");
+        var allPlayersReady = game.setPlayerReady(playerName);
+        if (allPlayersReady) {
+            game.getState().setInProgress(true);
+            broadcastReady();
+        }
+    }
+
     @GetMapping("/checkBlackJack")
-    public boolean checkBlackJack() {
+    public List<String> checkBlackJack() {
         return game.checkBlackJack();
     }
 
     @GetMapping("/isBust")
-    public boolean isBust() {
-        return game.isBust();
+    public boolean isBust(String name) {
+        return game.isBust(name);
     }
 
     private void broadcastGameState() {
         messagingTemplate.convertAndSend("/topic/game", game);
+    }
+
+    private void broadcastPlayersDone() {
+        messagingTemplate.convertAndSend("/topic/gameResult", Optional.empty());
+    }
+
+    private void broadcastReady() {
+        messagingTemplate.convertAndSend("/topic/ready", true);
+    }
+
+    private void broadcastUpdatePlayers(List<Player> joinedPlayers) {
+        messagingTemplate.convertAndSend("/topic/players", joinedPlayers);
+    }
+
+    @GetMapping("/inProgress")
+    public boolean inProgress() {
+        return game.getState().isInProgress();
     }
 }

@@ -1,13 +1,12 @@
 package com.casinodemo.engine;
 
 import com.casinodemo.engine.objects.Card;
-import com.casinodemo.engine.objects.enums.RANK;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Random;
 
 import static com.casinodemo.engine.GameState.calculateHand;
-import static com.casinodemo.engine.GameState.isBlackJack;
 
 @Getter
 public class Game {
@@ -18,41 +17,34 @@ public class Game {
     }
 
     public void start() {
-        // Reset hands
-        state.getPlayer().clearHand();
+        // Reset
         state.getDealer().clearHand();
+        state.getPlayers().forEach(Player::clearHand);
         state.getDeck().shuffleDeck();
+        state.getPlayers().forEach(player -> {
+            player.setFinished(false);
+            player.setReady(false);
+        });
 
-        // Init hands
-        state.getPlayer().getPlayerHand().addAll(List.of(state.drawCard(), state.drawCard()));
+        // Init hands and scores
         state.getDealer().getDealerHand().add(state.drawCard());
-
-        // Calculate scores
-        state.getPlayer().setScore(calculateHand(state.getPlayer().getPlayerHand()));
         state.getDealer().setScore(calculateHand(state.getDealer().getDealerHand()));
-    }
-
-    public int getPlayerScore() {
-        return state.getPlayer().getScore();
+        state.getPlayers().forEach(player -> {
+                player.getPlayerHand()
+                        .addAll((List.of(state.drawCard(), state.drawCard())));
+                player.setScore(calculateHand(player.getPlayerHand()));
+                });
     }
 
     public int getDealerScore() {
         return state.getDealer().getScore();
     }
 
-    public List<Card> getPlayerHand() {
-        return state.getPlayer().getPlayerHand();
-    }
-
-    public List<Card> getDealerHand() {
-        return state.getDealer().getDealerHand();
-    }
-
-    public Card playerDraw() {
+    public void playerDraw(String name) {
         var card = state.drawCard();
-        state.getPlayer().draw(card);
-        state.getPlayer().setScore(calculateHand(state.getPlayer().getPlayerHand()));
-        return card;
+        var player = state.getPlayerByName(name).get();
+        player.draw(card);
+        player.setScore(calculateHand(player.getPlayerHand()));
     }
 
     public Card dealerDraw() {
@@ -62,85 +54,37 @@ public class Game {
         return card;
     }
 
-    public void stay() {
-        while (getDealerScore() <= 17) {
-            dealerDraw();
+    public boolean stay(String playerName) {
+        state.getPlayerByName(playerName).get().setFinished(true);
+        var playersAreDone = state.getPlayers().stream()
+                .allMatch(Player::isFinished);
+        if (playersAreDone) {
+            while (getDealerScore() <= 17) {
+                dealerDraw();
+            }
         }
+        return playersAreDone;
     }
 
-    public boolean checkBlackJack() {
+    public List<String> checkBlackJack() {
         return state.checkBlackJack();
     }
 
-    public boolean isBust() {
-        return state.isBust(state.getPlayer().getScore());
+    public boolean isBust(String name) {
+        return state.isBust(name);
     }
 
-    public void play(int player) {
-//        var playerState = state.getPlayers().get(player);
-//        var playerScore = calculateHand(playerState.getPlayerHand());
-//        var dealerScore = calculateHand(state.getDealerHand());
-//
-//        if (isBlackJack(playerState.getPlayerHand()) && !isBlackJack(state.getDealerHand())) {
-//            playerState.setWin(true);
-//            return;
-//        }
-//
-//        if (!isBust(playerScore)) {
-
-//        }
-
-
-
-//        this.playerScore = calculateHand(playerHand);
-//        this.dealerScore = calculateHand(dealerHand);
-
-//        while (strategy.test(playerHand) && !isBlackJack(playerHand)) {
-//            playerDraw();
-//        }
-//
-//        if (isBlackJack(playerHand) && !isBlackJack(dealerHand)) {
-//            return new Result("PLAYER", playerScore, dealerScore, playerHand, dealerHand);
-//        }
-//
-//        if (!isBust(playerScore)) {
-//            dealerDraw();
-//        } else {
-//            return new Result("DEALER", playerScore, dealerScore, playerHand, dealerHand);
-//        }
-//
-//        return new Result(checkWinner(), playerScore, dealerScore, playerHand, dealerHand);
+    public void joinNewPlayer() {
+        state.getPlayers().add(new Player(new Random().nextInt(100)));
     }
 
-//    public static Integer calculateHand(List<Card> hand) {
-//        int sum = hand.stream()
-//                .map(Card::value)
-//                .reduce(0, Integer::sum);
-//
-//        long aceCount = hand.stream()
-//                .filter(card -> card.rank() == RANK.ACE)
-//                .count();
-//
-//        while (sum > 21 && aceCount > 0) {
-//            sum -= 10;
-//            aceCount--;
-//        }
-//
-//        return sum;
-//    }
+    public boolean setPlayerReady(String playerName) {
+        state.getPlayerByName(playerName).get().setReady(true);
+        return state.getPlayers().stream()
+                .allMatch(Player::isReady);
+    }
 
-//    private void dealerDraw(GameState state) {
-//        while (dealerScore <= 17) {
-//            dealerHand.add(deck.dealCard());
-//            dealerScore = calculateHand(dealerHand);
-//        }
-//    }
-
-//    private boolean isBust(int playerScore) {
-//        return playerScore > 21;
-//    }
-//
-//    public static boolean isBlackJack(List<Card> hand) {
-//        return hand.size() == 2 && calculateHand(hand) == 21;
-//    }
+    public void addPlayerToWaitingRoom() {
+        state.getWaitingPlayers().add(new Player(new Random().nextInt(100)));
+    }
 }

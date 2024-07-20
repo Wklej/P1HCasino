@@ -6,42 +6,44 @@ import com.casinodemo.engine.objects.Deck;
 import com.casinodemo.engine.objects.enums.RANK;
 import lombok.Data;
 
-import java.util.List;
+import java.util.*;
+import java.util.function.Predicate;
 
 @Data
 public class GameState {
     private Deck deck;
-//    private List<Card> dealerHand;
     //TODO: Player and Dealer class poly
-    private Player player;
     private Dealer dealer;
-    //TODO: later extend to multiplayer
-//    private List<Player> players;
-//    private List<Player> waitingPlayers;
+    private List<Player> players;
+    private List<Player> waitingPlayers;
     boolean inProgress;
 
     public GameState() {
         deck = new Deck();
-        player = new Player();
         dealer = new Dealer();
+        players = new ArrayList<>();
+        waitingPlayers = new ArrayList<>();
+        inProgress = false;
     }
 
-    //    public void resetHands() {
-//        dealerHand.clear();
-//        players.forEach(Player::clearHand);
-//    }
-
-//    public void joinWaitingPlayers() {
-//        players.addAll(waitingPlayers);
-//        waitingPlayers.clear();
-//    }
+    public List<Player> joinWaitingPlayers() {
+        players.addAll(waitingPlayers);
+        waitingPlayers.clear();
+        return players;
+    }
 
     public Card drawCard() {
         return deck.dealCard();
     }
 
-    public boolean checkBlackJack() {
-        return isBlackJack(player.getPlayerHand()) && !isBlackJack(dealer.getDealerHand());
+    public List<String> checkBlackJack() {
+        var BJs = new ArrayList<String>();
+        BJs.addAll(players.stream()
+                .filter(hasBlackJack())
+                .map(Player::getName)
+                .toList());
+
+        return BJs;
     }
 
     public static Integer calculateHand(List<Card> hand) {
@@ -61,11 +63,28 @@ public class GameState {
         return sum;
     }
 
-    public boolean isBust(int playerScore) {
-        return playerScore > 21;
+    public boolean isBust(String name) {
+        return players.stream()
+                .filter(player -> Objects.equals(player.getName(), name))
+                .anyMatch(isPlayerBust());
     }
 
     public static boolean isBlackJack(List<Card> hand) {
         return hand.size() == 2 && calculateHand(hand) == 21;
+    }
+
+    public Optional<Player> getPlayerByName(String name) {
+        return players.stream()
+                .filter(player -> Objects.equals(player.getName(), name))
+                .findFirst();
+    }
+
+    private Predicate<Player> hasBlackJack() {
+        return player -> isBlackJack(getPlayerByName(player.getName()).get().getPlayerHand())
+                && !isBlackJack(dealer.getDealerHand());
+    }
+
+    private Predicate<Player> isPlayerBust() {
+        return player -> player.getScore() > 21;
     }
 }

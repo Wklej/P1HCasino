@@ -13,9 +13,13 @@ public class Player {
     private Double balance;
     private boolean isReady;
     private boolean win;
+    private String name;
+    private boolean isFinished;
 
-    public Player() {
+    public Player(int name) {
         playerHand = new ArrayList<>();
+        this.name = String.valueOf(name);
+        this.isReady = false;
     }
 
     public void clearHand() {
