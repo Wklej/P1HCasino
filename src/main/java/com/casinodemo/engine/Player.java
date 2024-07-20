@@ -16,10 +16,6 @@ public class Player {
     private String name;
     private boolean isFinished;
 
-    public Player() {
-        playerHand = new ArrayList<>();
-    }
-
     public Player(int name) {
         playerHand = new ArrayList<>();
         this.name = String.valueOf(name);

@@ -27,7 +27,6 @@ public class GameState {
     }
 
     public List<Player> joinWaitingPlayers() {
-        var playersThatJoined = new ArrayList<>(waitingPlayers);
         players.addAll(waitingPlayers);
         waitingPlayers.clear();
         return players;
