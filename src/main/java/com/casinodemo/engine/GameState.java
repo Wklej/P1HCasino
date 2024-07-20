@@ -6,10 +6,7 @@ import com.casinodemo.engine.objects.Deck;
 import com.casinodemo.engine.objects.enums.RANK;
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 
 @Data
@@ -29,10 +26,12 @@ public class GameState {
         inProgress = false;
     }
 
-//    public void joinWaitingPlayers() {
-//        players.addAll(waitingPlayers);
-//        waitingPlayers.clear();
-//    }
+    public List<Player> joinWaitingPlayers() {
+        var playersThatJoined = new ArrayList<>(waitingPlayers);
+        players.addAll(waitingPlayers);
+        waitingPlayers.clear();
+        return players;
+    }
 
     public Card drawCard() {
         return deck.dealCard();

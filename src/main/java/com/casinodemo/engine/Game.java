@@ -26,7 +26,6 @@ public class Game {
             player.setReady(false);
         });
 
-
         // Init hands and scores
         state.getDealer().getDealerHand().add(state.drawCard());
         state.getDealer().setScore(calculateHand(state.getDealer().getDealerHand()));
@@ -83,5 +82,9 @@ public class Game {
         state.getPlayerByName(playerName).get().setReady(true);
         return state.getPlayers().stream()
                 .allMatch(Player::isReady);
+    }
+
+    public void addPlayerToWaitingRoom() {
+        state.getWaitingPlayers().add(new Player(new Random().nextInt(100)));
     }
 }

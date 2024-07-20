@@ -20,11 +20,15 @@ function connect() {
         console.log('Connected: ' + frame);
         stompClient.subscribe('/topic/game', function (message) {
             const game = JSON.parse(message.body);
+            console.warn("Updating game state...")
             updateGameState(game);
         });
         stompClient.subscribe("/topic/players", function (message) {
             const players = JSON.parse(message.body)
-            updatePlayers(players);
+            if (players.length !== 0) {
+                console.warn("Updating players...")
+                updatePlayers(players);
+            }
         })
         stompClient.subscribe("/topic/gameResult", function () {
             gameResults()

@@ -9,6 +9,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -26,8 +27,13 @@ public class GameController {
     @MessageMapping("/join")
     @SendTo("/topic/players")
     public List<Player> joinGame() {
-        game.joinNewPlayer();
-        return game.getState().getPlayers();
+        if (game.getState().isInProgress()) {
+            game.addPlayerToWaitingRoom();
+            return Collections.emptyList();
+        } else {
+            game.joinNewPlayer();
+            return game.getState().getPlayers();
+        }
     }
 
     @MessageMapping("/start")
@@ -47,11 +53,17 @@ public class GameController {
     public void playerStay(@Payload Map<String, String> payload) {
         var playerName = payload.get("playerName");
         var playersAreDone = game.stay(playerName);
-        broadcastGameState();
         if (playersAreDone) {
             broadcastPlayersDone();
             game.getState().setInProgress(false);
+
+            //When players done, check waiting room and join waiting players
+            if (!game.getState().getWaitingPlayers().isEmpty()) {
+                broadcastUpdatePlayers(game.getState().joinWaitingPlayers());
+            }
         }
+
+        broadcastGameState();
     }
 
     @MessageMapping("/ready")
@@ -84,6 +96,10 @@ public class GameController {
 
     private void broadcastReady() {
         messagingTemplate.convertAndSend("/topic/ready", true);
+    }
+
+    private void broadcastUpdatePlayers(List<Player> joinedPlayers) {
+        messagingTemplate.convertAndSend("/topic/players", joinedPlayers);
     }
 
     @GetMapping("/inProgress")
